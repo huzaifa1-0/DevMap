@@ -3,6 +3,10 @@ src/**
 tsconfig.json
 DevMap_Implementation_Plan.pdf
 DevMap_Implementation_Plan.txt
+DevMap_V2_Groq_Plan.pdf
+DevMap_V2_Groq_Plan.txt
+new.py
+package-lock.json
 node_modules/@types/**
 .git/**
 .vscode-test/**

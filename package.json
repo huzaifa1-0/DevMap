@@ -2,7 +2,7 @@
   "name": "devmap",
   "displayName": "DevMap",
   "description": "DevMap tracks your JS/Node/Express learning progress as you code using AST parsing.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "devmap",
   "engines": {
     "vscode": "^1.75.0"
@@ -51,6 +51,28 @@
         "command": "devmap.resetProgress",
         "title": "DevMap: Reset Progress",
         "category": "DevMap"
+      },
+      {
+        "command": "devmap.setApiKey",
+        "title": "DevMap: Set Groq API Key",
+        "category": "DevMap"
+      },
+      {
+        "command": "devmap.clearApiKey",
+        "title": "DevMap: Clear Groq API Key",
+        "category": "DevMap"
+      },
+      {
+        "command": "devmap.explainTopic",
+        "title": "Explain with Groq",
+        "category": "DevMap",
+        "icon": "$(info)"
+      },
+      {
+        "command": "devmap.quizTopic",
+        "title": "Start Quiz",
+        "category": "DevMap",
+        "icon": "$(question)"
       }
     ],
     "menus": {
@@ -65,6 +87,18 @@
           "when": "view == devmap.topicsView",
           "group": "navigation"
         }
+      ],
+      "view/item/context": [
+        {
+          "command": "devmap.explainTopic",
+          "when": "view == devmap.topicsView && viewItem == topic",
+          "group": "inline"
+        },
+        {
+          "command": "devmap.quizTopic",
+          "when": "view == devmap.topicsView && viewItem == topic",
+          "group": "inline"
+        }
       ]
     }
   },
@@ -77,7 +111,8 @@
   },
   "dependencies": {
     "@babel/parser": "^7.24.0",
-    "@babel/traverse": "^7.24.0"
+    "@babel/traverse": "^7.24.0",
+    "groq-sdk": "^1.2.1"
   },
   "devDependencies": {
     "@types/babel__traverse": "^7.20.5",

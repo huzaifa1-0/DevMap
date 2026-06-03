@@ -6,15 +6,19 @@ import { DevMapStore } from './store';
 import { TopicProvider } from './topicProvider';
 import { DashboardPanel } from './dashboardPanel';
 import { scanCodeForTopics } from './scanner';
+import { SecretStore } from './secretStore';
+import { AIPanel } from './aiPanel';
+import { AICache } from './cache';
 
 let statusBarItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log('DevMap extension is now active!');
+  console.log('DevMap V2 extension is now active!');
 
-  // Initialize Store
+  // Initialize Store and SecretStore
   const store = DevMapStore.getInstance();
   store.initialize(context);
+  SecretStore.getInstance().initialize(context);
 
   // Register TreeView Sidebar Provider
   const topicProvider = new TopicProvider();
@@ -54,15 +58,15 @@ export function activate(context: vscode.ExtensionContext) {
       const previouslyCovered = store.getCoveredTopics();
       const unlocked: string[] = [];
 
-      detected.forEach(topicId => {
+      detected.forEach((snippet, topicId) => {
         if (!previouslyCovered.has(topicId)) {
           unlocked.push(topicId);
         }
       });
 
       if (unlocked.length > 0) {
-        // Add all detected topics
-        store.addCoveredTopics(detected);
+        // Add all detected topics with snippets
+        store.addCoveredTopicsWithSnippets(detected);
 
         // Find labels and display notification
         const tracks = (topicsData as any).tracks;
@@ -77,7 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
         });
       } else {
         // Save anyway to cover the state
-        store.addCoveredTopics(detected);
+        store.addCoveredTopicsWithSnippets(detected);
       }
     } catch (err) {
       console.error('Error scanning saved document: ', err);
@@ -112,14 +116,16 @@ export function activate(context: vscode.ExtensionContext) {
       // Find all JS/TS files
       const files = await vscode.workspace.findFiles('**/*.{js,ts,jsx,tsx}', '**/node_modules/**');
       let scannedCount = 0;
-      const allDetected = new Set<string>();
+      const allDetected = new Map<string, string>();
 
       for (const file of files) {
         try {
           const docBytes = await vscode.workspace.fs.readFile(file);
           const docText = Buffer.from(docBytes).toString('utf-8');
           const detected = scanCodeForTopics(docText, file.fsPath);
-          detected.forEach(topicId => allDetected.add(topicId));
+          detected.forEach((snippet, topicId) => {
+            allDetected.set(topicId, snippet);
+          });
           scannedCount++;
         } catch (e) {
           console.error('Failed to read file during scan:', file.fsPath, e);
@@ -130,13 +136,13 @@ export function activate(context: vscode.ExtensionContext) {
       const previouslyCovered = store.getCoveredTopics();
       const unlocked: string[] = [];
 
-      allDetected.forEach(topicId => {
+      allDetected.forEach((snippet, topicId) => {
         if (!previouslyCovered.has(topicId)) {
           unlocked.push(topicId);
         }
       });
 
-      store.addCoveredTopics(allDetected);
+      store.addCoveredTopicsWithSnippets(allDetected);
 
       if (unlocked.length > 0) {
         vscode.window.showInformationMessage(`DevMap Scan Complete: Analyzed ${scannedCount} files, unlocking ${unlocked.length} new topics!`);
@@ -146,6 +152,55 @@ export function activate(context: vscode.ExtensionContext) {
     });
   });
   context.subscriptions.push(scanWorkspaceCmd);
+
+  // 5. Command: Set API Key
+  const setApiKeyCmd = vscode.commands.registerCommand('devmap.setApiKey', async () => {
+    const key = await vscode.window.showInputBox({
+      prompt: 'Enter your Groq API Key',
+      password: true,
+      placeHolder: 'gsk_...'
+    });
+    if (key) {
+      await SecretStore.getInstance().setApiKey(key);
+      AICache.getInstance().clear();
+      vscode.window.showInformationMessage('Groq API Key set successfully.');
+    }
+  });
+  context.subscriptions.push(setApiKeyCmd);
+
+  // 6. Command: Clear API Key
+  const clearApiKeyCmd = vscode.commands.registerCommand('devmap.clearApiKey', async () => {
+    await SecretStore.getInstance().clearApiKey();
+    AICache.getInstance().clear();
+    vscode.window.showInformationMessage('Groq API Key cleared.');
+  });
+  context.subscriptions.push(clearApiKeyCmd);
+
+  // 7. Command: Explain Topic (Sidebar AI Panel)
+  const explainTopicCmd = vscode.commands.registerCommand('devmap.explainTopic', (topicId: string) => {
+    if (!topicId) {
+      vscode.window.showErrorMessage('No topic selected.');
+      return;
+    }
+    AIPanel.createOrShow(context.extensionUri, topicId);
+  });
+  context.subscriptions.push(explainTopicCmd);
+
+  // 8. Command: Quiz Topic (Sidebar AI Panel)
+  const quizTopicCmd = vscode.commands.registerCommand('devmap.quizTopic', (topicId: string) => {
+    if (!topicId) {
+      vscode.window.showErrorMessage('No topic selected.');
+      return;
+    }
+    AIPanel.createOrShow(context.extensionUri, topicId);
+    if (AIPanel.currentPanel) {
+      // Small delay to ensure Webview handles the postMessage initTopic first
+      setTimeout(() => {
+        vscode.commands.executeCommand('workbench.action.webview.reload'); // or just trust trigger
+      }, 100);
+    }
+  });
+  context.subscriptions.push(quizTopicCmd);
 
   // Auto scan open text editor on activate
   if (vscode.window.activeTextEditor) {
@@ -170,3 +225,4 @@ function updateStatusBar() {
 export function deactivate() {
   // cleanup if necessary
 }
+

@@ -98,11 +98,11 @@ class TopicTreeItem extends vscode.TreeItem {
       this.description = 'Pending';
     }
 
-    // Assign command to open the documentation link on click
+    // Assign command to trigger AI Tutor explanation in sidebar
     this.command = {
-      command: 'vscode.open',
-      title: 'Open Documentation',
-      arguments: [vscode.Uri.parse(topic.docsUrl)]
+      command: 'devmap.explainTopic',
+      title: 'Explain Topic',
+      arguments: [topic.id]
     };
   }
 }

@@ -2,10 +2,33 @@ import * as parser from '@babel/parser';
 import traverse from '@babel/traverse';
 
 /**
- * Scans a given block of JS/TS code and returns a Set of detected topic IDs.
+ * Extracts the exact code snippet for a given AST node.
  */
-export function scanCodeForTopics(code: string, filepath: string): Set<string> {
-  const matchedTopics = new Set<string>();
+function extractSnippet(code: string, node: any): string {
+  if (node && node.loc) {
+    const startLine = node.loc.start.line;
+    const endLine = node.loc.end.line;
+    const lines = code.split('\n');
+    const matchedLines = lines.slice(startLine - 1, endLine);
+    if (matchedLines.length > 25) {
+      return matchedLines.slice(0, 25).join('\n') + '\n... [truncated]';
+    }
+    return matchedLines.join('\n');
+  }
+  return '';
+}
+
+/**
+ * Scans a given block of JS/TS code and returns a Map of detected topic IDs to their code snippets.
+ */
+export function scanCodeForTopics(code: string, filepath: string): Map<string, string> {
+  const matchedTopics = new Map<string, string>();
+
+  const addMatch = (topicId: string, node: any) => {
+    if (!matchedTopics.has(topicId)) {
+      matchedTopics.set(topicId, extractSnippet(code, node));
+    }
+  };
 
   // Detect file type for parser plugins
   const isTypeScript = filepath.endsWith('.ts') || filepath.endsWith('.tsx');
@@ -29,25 +52,25 @@ export function scanCodeForTopics(code: string, filepath: string): Set<string> {
     });
 
     traverse(ast, {
-      VariableDeclaration() {
-        matchedTopics.add('variables_scope');
+      VariableDeclaration(path) {
+        addMatch('variables_scope', path.node);
       },
 
       ArrowFunctionExpression(path) {
-        matchedTopics.add('arrow_fn');
+        addMatch('arrow_fn', path.node);
         
         // Check for express req/res parameters
         const params = path.node.params;
         if (params.length === 4) {
-          matchedTopics.add('express_error_middleware');
+          addMatch('express_error_middleware', path.node);
         }
         params.forEach(param => {
           if (param.type === 'Identifier') {
             if (param.name === 'req' || param.name === 'request') {
-              matchedTopics.add('express_req_obj');
+              addMatch('express_req_obj', path.node);
             }
             if (param.name === 'res' || param.name === 'response') {
-              matchedTopics.add('express_res_obj');
+              addMatch('express_res_obj', path.node);
             }
           }
         });
@@ -55,24 +78,24 @@ export function scanCodeForTopics(code: string, filepath: string): Set<string> {
 
       FunctionDeclaration(path) {
         if (path.node.async) {
-          matchedTopics.add('async_await');
+          addMatch('async_await', path.node);
         }
         if (path.node.generator) {
-          matchedTopics.add('generators');
+          addMatch('generators', path.node);
         }
 
         // Check for express req/res parameters
         const params = path.node.params;
         if (params.length === 4) {
-          matchedTopics.add('express_error_middleware');
+          addMatch('express_error_middleware', path.node);
         }
         params.forEach(param => {
           if (param.type === 'Identifier') {
             if (param.name === 'req' || param.name === 'request') {
-              matchedTopics.add('express_req_obj');
+              addMatch('express_req_obj', path.node);
             }
             if (param.name === 'res' || param.name === 'response') {
-              matchedTopics.add('express_res_obj');
+              addMatch('express_res_obj', path.node);
             }
           }
         });
@@ -80,88 +103,88 @@ export function scanCodeForTopics(code: string, filepath: string): Set<string> {
 
       FunctionExpression(path) {
         if (path.node.async) {
-          matchedTopics.add('async_await');
+          addMatch('async_await', path.node);
         }
         if (path.node.generator) {
-          matchedTopics.add('generators');
+          addMatch('generators', path.node);
         }
 
         // Check for express req/res parameters
         const params = path.node.params;
         if (params.length === 4) {
-          matchedTopics.add('express_error_middleware');
+          addMatch('express_error_middleware', path.node);
         }
         params.forEach(param => {
           if (param.type === 'Identifier') {
             if (param.name === 'req' || param.name === 'request') {
-              matchedTopics.add('express_req_obj');
+              addMatch('express_req_obj', path.node);
             }
             if (param.name === 'res' || param.name === 'response') {
-              matchedTopics.add('express_res_obj');
+              addMatch('express_res_obj', path.node);
             }
           }
         });
       },
 
-      ObjectPattern() {
-        matchedTopics.add('destructuring');
+      ObjectPattern(path) {
+        addMatch('destructuring', path.node);
       },
 
-      ArrayPattern() {
-        matchedTopics.add('destructuring');
+      ArrayPattern(path) {
+        addMatch('destructuring', path.node);
       },
 
-      SpreadElement() {
-        matchedTopics.add('spread_rest');
+      SpreadElement(path) {
+        addMatch('spread_rest', path.node);
       },
 
-      RestElement() {
-        matchedTopics.add('spread_rest');
+      RestElement(path) {
+        addMatch('spread_rest', path.node);
       },
 
-      TemplateLiteral() {
-        matchedTopics.add('template_literals');
+      TemplateLiteral(path) {
+        addMatch('template_literals', path.node);
       },
 
-      TryStatement() {
-        matchedTopics.add('error_handling');
+      TryStatement(path) {
+        addMatch('error_handling', path.node);
       },
 
-      ClassDeclaration() {
-        matchedTopics.add('classes');
+      ClassDeclaration(path) {
+        addMatch('classes', path.node);
       },
 
-      ClassExpression() {
-        matchedTopics.add('classes');
+      ClassExpression(path) {
+        addMatch('classes', path.node);
       },
 
-      AwaitExpression() {
-        matchedTopics.add('async_await');
+      AwaitExpression(path) {
+        addMatch('async_await', path.node);
       },
 
-      DebuggerStatement() {
-        matchedTopics.add('debugging');
+      DebuggerStatement(path) {
+        addMatch('debugging', path.node);
       },
 
       ImportDeclaration(path) {
-        matchedTopics.add('es_modules');
+        addMatch('es_modules', path.node);
         const sourceVal = path.node.source.value;
         if (sourceVal === 'fs' || sourceVal === 'fs/promises' || sourceVal.startsWith('node:fs')) {
-          matchedTopics.add('fs_module');
+          addMatch('fs_module', path.node);
         } else if (sourceVal === 'path' || sourceVal.startsWith('node:path')) {
-          matchedTopics.add('path_module');
+          addMatch('path_module', path.node);
         } else if (sourceVal === 'stream' || sourceVal.startsWith('node:stream')) {
-          matchedTopics.add('streams');
+          addMatch('streams', path.node);
         } else if (sourceVal === 'events' || sourceVal.startsWith('node:events')) {
-          matchedTopics.add('event_emitter');
+          addMatch('event_emitter', path.node);
         } else if (sourceVal === 'http' || sourceVal.startsWith('node:http')) {
-          matchedTopics.add('http_module');
+          addMatch('http_module', path.node);
         } else if (sourceVal === 'child_process' || sourceVal.startsWith('node:child_process')) {
-          matchedTopics.add('child_process');
+          addMatch('child_process', path.node);
         } else if (sourceVal === 'express') {
-          matchedTopics.add('express_setup');
+          addMatch('express_setup', path.node);
         } else if (sourceVal === 'cors') {
-          matchedTopics.add('express_cors');
+          addMatch('express_cors', path.node);
         }
       },
 
@@ -169,9 +192,9 @@ export function scanCodeForTopics(code: string, filepath: string): Set<string> {
         const { callee } = path.node;
         if (callee.type === 'Identifier') {
           if (callee.name === 'Promise') {
-            matchedTopics.add('promises');
+            addMatch('promises', path.node);
           } else if (callee.name === 'EventEmitter') {
-            matchedTopics.add('event_emitter');
+            addMatch('event_emitter', path.node);
           }
         }
       },
@@ -181,32 +204,32 @@ export function scanCodeForTopics(code: string, filepath: string): Set<string> {
 
         // CommonJS require and core modules
         if (callee.type === 'Identifier' && callee.name === 'require') {
-          matchedTopics.add('commonjs');
+          addMatch('commonjs', path.node);
           if (args.length > 0 && args[0].type === 'StringLiteral') {
             const reqVal = args[0].value;
             if (reqVal === 'fs' || reqVal === 'fs/promises' || reqVal.startsWith('node:fs')) {
-              matchedTopics.add('fs_module');
+              addMatch('fs_module', path.node);
             } else if (reqVal === 'path' || reqVal.startsWith('node:path')) {
-              matchedTopics.add('path_module');
+              addMatch('path_module', path.node);
             } else if (reqVal === 'stream' || reqVal.startsWith('node:stream')) {
-              matchedTopics.add('streams');
+              addMatch('streams', path.node);
             } else if (reqVal === 'events' || reqVal.startsWith('node:events')) {
-              matchedTopics.add('event_emitter');
+              addMatch('event_emitter', path.node);
             } else if (reqVal === 'http' || reqVal.startsWith('node:http')) {
-              matchedTopics.add('http_module');
+              addMatch('http_module', path.node);
             } else if (reqVal === 'child_process' || reqVal.startsWith('node:child_process')) {
-              matchedTopics.add('child_process');
+              addMatch('child_process', path.node);
             } else if (reqVal === 'express') {
-              matchedTopics.add('express_setup');
+              addMatch('express_setup', path.node);
             } else if (reqVal === 'cors') {
-              matchedTopics.add('express_cors');
+              addMatch('express_cors', path.node);
             }
           }
         }
 
         // Express app() call
         if (callee.type === 'Identifier' && callee.name === 'express') {
-          matchedTopics.add('express_setup');
+          addMatch('express_setup', path.node);
         }
 
         // Member expressions e.g. console.log(), array.map(), res.send()
@@ -217,38 +240,38 @@ export function scanCodeForTopics(code: string, filepath: string): Set<string> {
           if (prop.type === 'Identifier') {
             // Promise .then / .catch
             if (prop.name === 'then' || prop.name === 'catch') {
-              matchedTopics.add('promises');
+              addMatch('promises', path.node);
             }
             // Streams .pipe
             if (prop.name === 'pipe') {
-              matchedTopics.add('streams');
+              addMatch('streams', path.node);
             }
             // Array methods
             if (['map', 'filter', 'reduce', 'forEach', 'find', 'some', 'every'].includes(prop.name)) {
-              matchedTopics.add('array_methods');
+              addMatch('array_methods', path.node);
             }
             // Express Router
             if (prop.name === 'Router' && obj.type === 'Identifier' && obj.name === 'express') {
-              matchedTopics.add('express_router_mod');
+              addMatch('express_router_mod', path.node);
             }
             // Express body parsing: express.json(), express.urlencoded(), bodyParser.json()
             if (['json', 'urlencoded'].includes(prop.name)) {
               if (obj.type === 'Identifier' && (obj.name === 'express' || obj.name === 'bodyParser' || obj.name.toLowerCase().includes('bodyparser'))) {
-                matchedTopics.add('express_body_parsing');
+                addMatch('express_body_parsing', path.node);
               }
             }
             // Express static
             if (prop.name === 'static' && obj.type === 'Identifier' && obj.name === 'express') {
-              matchedTopics.add('express_static');
+              addMatch('express_static', path.node);
             }
             // Routing and middleware
             if (['get', 'post', 'put', 'delete', 'use'].includes(prop.name)) {
               // Usually called on an object named app, router, etc.
               if (obj.type === 'Identifier' && (obj.name === 'app' || obj.name === 'router' || obj.name === 'api' || obj.name === 'server')) {
                 if (prop.name === 'use') {
-                  matchedTopics.add('express_middleware');
+                  addMatch('express_middleware', path.node);
                 } else {
-                  matchedTopics.add('express_routing');
+                  addMatch('express_routing', path.node);
                 }
               }
             }
@@ -259,9 +282,9 @@ export function scanCodeForTopics(code: string, filepath: string): Set<string> {
       Identifier(path) {
         const name = path.node.name;
         if (name === 'process') {
-          matchedTopics.add('process_object');
+          addMatch('process_object', path.node);
         } else if (name === 'Buffer') {
-          matchedTopics.add('buffers');
+          addMatch('buffers', path.node);
         }
       },
 
@@ -270,16 +293,16 @@ export function scanCodeForTopics(code: string, filepath: string): Set<string> {
         const prop = path.node.property;
 
         if (obj.type === 'Identifier' && obj.name === 'process' && prop.type === 'Identifier' && prop.name === 'env') {
-          matchedTopics.add('env_variables');
+          addMatch('env_variables', path.node);
         }
 
         // Check for request/response usage e.g. req.body, res.send
         if (obj.type === 'Identifier') {
           if (obj.name === 'req' || obj.name === 'request') {
-            matchedTopics.add('express_req_obj');
+            addMatch('express_req_obj', path.node);
           }
           if (obj.name === 'res' || obj.name === 'response') {
-            matchedTopics.add('express_res_obj');
+            addMatch('express_res_obj', path.node);
           }
         }
       }
@@ -290,3 +313,4 @@ export function scanCodeForTopics(code: string, filepath: string): Set<string> {
 
   return matchedTopics;
 }
+
