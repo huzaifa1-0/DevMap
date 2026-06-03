@@ -1,0 +1,88 @@
+{
+  "name": "devmap",
+  "displayName": "DevMap",
+  "description": "DevMap tracks your JS/Node/Express learning progress as you code using AST parsing.",
+  "version": "0.1.0",
+  "publisher": "devmap",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "devmap-sidebar",
+          "title": "DevMap",
+          "icon": "media/map-icon.png"
+        }
+      ]
+    },
+    "views": {
+      "devmap-sidebar": [
+        {
+          "id": "devmap.topicsView",
+          "name": "Learning Progress",
+          "type": "tree"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "devmap.openDashboard",
+        "title": "DevMap: Open Web Dashboard",
+        "category": "DevMap"
+      },
+      {
+        "command": "devmap.scanWorkspace",
+        "title": "DevMap: Scan Workspace for Topics",
+        "category": "DevMap"
+      },
+      {
+        "command": "devmap.resetProgress",
+        "title": "DevMap: Reset Progress",
+        "category": "DevMap"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "devmap.openDashboard",
+          "when": "view == devmap.topicsView",
+          "group": "navigation"
+        },
+        {
+          "command": "devmap.scanWorkspace",
+          "when": "view == devmap.topicsView",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.24.0",
+    "@babel/traverse": "^7.24.0"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "^7.20.5",
+    "@types/node": "^18.15.0",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.0.2"
+  }
+}

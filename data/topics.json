@@ -1,0 +1,220 @@
+{
+  "tracks": [
+    {
+      "id": "javascript",
+      "label": "JavaScript Core",
+      "topics": [
+        {
+          "id": "variables_scope",
+          "label": "Variables & Scope",
+          "astPattern": "VariableDeclaration",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types#declarations"
+        },
+        {
+          "id": "arrow_fn",
+          "label": "Arrow Functions",
+          "astPattern": "ArrowFunctionExpression",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions"
+        },
+        {
+          "id": "destructuring",
+          "label": "Destructuring",
+          "astPattern": "ObjectPattern|ArrayPattern",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment"
+        },
+        {
+          "id": "spread_rest",
+          "label": "Spread / Rest",
+          "astPattern": "SpreadElement|RestElement",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax"
+        },
+        {
+          "id": "template_literals",
+          "label": "Template Literals",
+          "astPattern": "TemplateLiteral",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals"
+        },
+        {
+          "id": "promises",
+          "label": "Promises",
+          "astPattern": "NewPromise|PromiseThen",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
+        },
+        {
+          "id": "async_await",
+          "label": "Async / Await",
+          "astPattern": "AwaitExpression|AsyncFunction",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function"
+        },
+        {
+          "id": "es_modules",
+          "label": "ES Modules (import/export)",
+          "astPattern": "ImportDeclaration|ExportNamedDeclaration|ExportDefaultDeclaration",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules"
+        },
+        {
+          "id": "generators",
+          "label": "Generators",
+          "astPattern": "GeneratorFunction",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator"
+        },
+        {
+          "id": "classes",
+          "label": "Classes",
+          "astPattern": "ClassDeclaration|ClassExpression",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes"
+        },
+        {
+          "id": "error_handling",
+          "label": "Error Handling",
+          "astPattern": "TryStatement",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch"
+        },
+        {
+          "id": "array_methods",
+          "label": "Array Methods",
+          "astPattern": "ArrayMethodCall",
+          "docsUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"
+        }
+      ]
+    },
+    {
+      "id": "node",
+      "label": "Node.js Core",
+      "topics": [
+        {
+          "id": "fs_module",
+          "label": "File System (fs)",
+          "astPattern": "NodeFs",
+          "docsUrl": "https://nodejs.org/api/fs.html"
+        },
+        {
+          "id": "path_module",
+          "label": "Path Module",
+          "astPattern": "NodePath",
+          "docsUrl": "https://nodejs.org/api/path.html"
+        },
+        {
+          "id": "streams",
+          "label": "Streams & Pipe",
+          "astPattern": "NodeStream",
+          "docsUrl": "https://nodejs.org/api/stream.html"
+        },
+        {
+          "id": "event_emitter",
+          "label": "EventEmitter",
+          "astPattern": "NodeEventEmitter",
+          "docsUrl": "https://nodejs.org/api/events.html"
+        },
+        {
+          "id": "http_module",
+          "label": "HTTP Module",
+          "astPattern": "NodeHttp",
+          "docsUrl": "https://nodejs.org/api/http.html"
+        },
+        {
+          "id": "process_object",
+          "label": "Process Object",
+          "astPattern": "NodeProcess",
+          "docsUrl": "https://nodejs.org/api/process.html"
+        },
+        {
+          "id": "child_process",
+          "label": "Child Process",
+          "astPattern": "NodeChildProcess",
+          "docsUrl": "https://nodejs.org/api/child_process.html"
+        },
+        {
+          "id": "buffers",
+          "label": "Buffers",
+          "astPattern": "NodeBuffer",
+          "docsUrl": "https://nodejs.org/api/buffer.html"
+        },
+        {
+          "id": "env_variables",
+          "label": "Environment Variables",
+          "astPattern": "NodeEnv",
+          "docsUrl": "https://nodejs.org/api/process.html#processenv"
+        },
+        {
+          "id": "commonjs",
+          "label": "CommonJS (require)",
+          "astPattern": "CommonJSRequire",
+          "docsUrl": "https://nodejs.org/api/modules.html"
+        },
+        {
+          "id": "debugging",
+          "label": "Debugging (debugger)",
+          "astPattern": "DebuggerStatement",
+          "docsUrl": "https://nodejs.org/en/docs/guides/debugging-getting-started"
+        }
+      ]
+    },
+    {
+      "id": "express",
+      "label": "Express Framework",
+      "topics": [
+        {
+          "id": "express_setup",
+          "label": "Express App Setup",
+          "astPattern": "ExpressSetup",
+          "docsUrl": "https://expressjs.com/en/starter/hello-world.html"
+        },
+        {
+          "id": "express_routing",
+          "label": "Routing",
+          "astPattern": "ExpressRouting",
+          "docsUrl": "https://expressjs.com/en/guide/routing.html"
+        },
+        {
+          "id": "express_middleware",
+          "label": "Middleware Usage",
+          "astPattern": "ExpressMiddleware",
+          "docsUrl": "https://expressjs.com/en/guide/using-middleware.html"
+        },
+        {
+          "id": "express_error_middleware",
+          "label": "Error Middleware",
+          "astPattern": "ExpressErrorMiddleware",
+          "docsUrl": "https://expressjs.com/en/guide/error-handling.html"
+        },
+        {
+          "id": "express_req_obj",
+          "label": "Request Object (req)",
+          "astPattern": "ExpressReqObject",
+          "docsUrl": "https://expressjs.com/en/4x/api.html#req"
+        },
+        {
+          "id": "express_res_obj",
+          "label": "Response Object (res)",
+          "astPattern": "ExpressResObject",
+          "docsUrl": "https://expressjs.com/en/4x/api.html#res"
+        },
+        {
+          "id": "express_static",
+          "label": "Static Files",
+          "astPattern": "ExpressStatic",
+          "docsUrl": "https://expressjs.com/en/starter/static-files.html"
+        },
+        {
+          "id": "express_body_parsing",
+          "label": "Body Parsing",
+          "astPattern": "ExpressBodyParsing",
+          "docsUrl": "https://expressjs.com/en/resources/middleware/body-parser.html"
+        },
+        {
+          "id": "express_router_mod",
+          "label": "Router Module",
+          "astPattern": "ExpressRouter",
+          "docsUrl": "https://expressjs.com/en/guide/routing.html#express-router"
+        },
+        {
+          "id": "express_cors",
+          "label": "CORS Integration",
+          "astPattern": "ExpressCors",
+          "docsUrl": "https://expressjs.com/en/resources/middleware/cors.html"
+        }
+      ]
+    }
+  ]
+}

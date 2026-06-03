@@ -1,0 +1,8 @@
+.vscode/**
+src/**
+tsconfig.json
+DevMap_Implementation_Plan.pdf
+DevMap_Implementation_Plan.txt
+node_modules/@types/**
+.git/**
+.vscode-test/**
